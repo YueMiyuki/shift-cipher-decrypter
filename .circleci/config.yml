@@ -18,8 +18,10 @@ jobs:
     steps:
       # Checkout the code as the first step.
       - checkout
-      - run: ls
-      - run: sudo apt-get update && sudo apt-get install python3
+      - run: ls -larth
+      - run: sudo apt-get update && sudo apt-get install python3 curl
+      - run: curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py 
+      - run: python get-pip.py
       - run: python -m pip insatll unittest && python -m pip install -r requirements.txt
       - run: python -m unittest .
 
