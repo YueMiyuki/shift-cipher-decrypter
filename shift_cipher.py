@@ -27,16 +27,38 @@ english_dict = enchant.Dict("en_US")
 # English letter frequencies from Wikipedia
 # https://en.wikipedia.org/wiki/Letter_frequency
 ENGLISH_FREQUENCIES = {
-    'E': 12.7, 'T': 9.1, 'A': 8.2, 'O': 7.5, 'I': 7.0, 
-    'N': 6.7, 'S': 6.3, 'H': 6.1, 'R': 6.0, 'L': 4.0, 
-    'D': 4.3, 'C': 2.8, 'U': 2.8, 'M': 2.4, 'W': 2.4,
-    'F': 2.2, 'G': 2.0, 'Y': 2.0, 'P': 1.9, 'B': 1.5,
-    'V': 0.98, 'K': 0.77, 'J': 0.15, 'X': 0.15,
-    'Q': 0.095, 'Z': 0.074
+    "E": 12.7,
+    "T": 9.1,
+    "A": 8.2,
+    "O": 7.5,
+    "I": 7.0,
+    "N": 6.7,
+    "S": 6.3,
+    "H": 6.1,
+    "R": 6.0,
+    "L": 4.0,
+    "D": 4.3,
+    "C": 2.8,
+    "U": 2.8,
+    "M": 2.4,
+    "W": 2.4,
+    "F": 2.2,
+    "G": 2.0,
+    "Y": 2.0,
+    "P": 1.9,
+    "B": 1.5,
+    "V": 0.98,
+    "K": 0.77,
+    "J": 0.15,
+    "X": 0.15,
+    "Q": 0.095,
+    "Z": 0.074,
 }
 
 # Precompute the maximum possible sum of differences
-max_sum = sum(ENGLISH_FREQUENCIES.values()) + 100  # Sum of English frequencies plus 100% for non-English letters
+# Sum of English frequencies plus 100% for non-English letters
+max_sum = sum(ENGLISH_FREQUENCIES.values()) + 100
+
 
 def ccase(char, to_upper=False):
     """
@@ -56,11 +78,12 @@ def ccase(char, to_upper=False):
              it is returned as is.
     """
 
-    if 'A' <= char <= 'Z' and not to_upper:
+    if "A" <= char <= "Z" and not to_upper:
         return chr(ord(char) + 32)
-    elif 'a' <= char <= 'z' and to_upper:
+    elif "a" <= char <= "z" and to_upper:
         return chr(ord(char) - 32)
     return char
+
 
 def cisalpha(char):
     """
@@ -77,7 +100,7 @@ def cisalpha(char):
               False otherwise.
     """
 
-    return ('a' <= char <= 'z') or ('A' <= char <= 'Z')
+    return ("a" <= char <= "z") or ("A" <= char <= "Z")
 
 
 def shift_char(char, shift):
@@ -101,10 +124,10 @@ def shift_char(char, shift):
         - Non-alphabetic characters are returned unchanged.
     """
 
-    if 'a' <= char <= 'z':
-        return chr((ord(char) - ord('a') + shift) % 26 + ord('a'))
-    elif 'A' <= char <= 'Z':
-        return chr((ord(char) - ord('A') + shift) % 26 + ord('A'))
+    if "a" <= char <= "z":
+        return chr((ord(char) - ord("a") + shift) % 26 + ord("a"))
+    elif "A" <= char <= "Z":
+        return chr((ord(char) - ord("A") + shift) % 26 + ord("A"))
     return char
 
 
@@ -128,7 +151,8 @@ def decrypt(text, shift):
         The function uses the shift_char() function to perform individual character shifts.
     """
 
-    return ''.join(shift_char(char, -shift) for char in text)
+    return "".join(shift_char(char, -shift) for char in text)
+
 
 def count_letters(text):
     """
@@ -152,6 +176,7 @@ def count_letters(text):
     counter = Counter(ccase(char) for char in text if cisalpha(char))
     total = sum(counter.values())
     return {k.upper(): (v / total * 100) for k, v in counter.items()}
+
 
 def calculate_frequency_score(frequencies):
     """
@@ -182,6 +207,7 @@ def calculate_frequency_score(frequencies):
     score = ((max_sum - total_difference) / max_sum) * 100
     return max(0.0, min(100.0, score))
 
+
 def analyze_text(text):
     """
     Analyze the given text by calculating letter frequencies and a frequency score.
@@ -203,6 +229,7 @@ def analyze_text(text):
     score = calculate_frequency_score(frequencies)
     return frequencies, score
 
+
 def validate_decryption(decrypted, sample_size=10, threshold=0.7):
     """
     Validate a decrypted text by randomly sampling words and checking against an English dictionary.
@@ -222,26 +249,27 @@ def validate_decryption(decrypted, sample_size=10, threshold=0.7):
     # Clean each word by removing non-alphabetic characters and convert to lowercase
     words = []
     for word in decrypted.split():
-        cleaned_word = ''.join([c for c in word if cisalpha(c)])
+        cleaned_word = "".join([c for c in word if cisalpha(c)])
         if cleaned_word:
             words.append(cleaned_word.lower())
-    
+
     total_words = len(words)
-    
+
     if total_words == 0:
         return False
-    
+
     words_to_check = min(sample_size, total_words)
-    
+
     if total_words > sample_size:
         sampled_words = random.sample(words, words_to_check)
     else:
         sampled_words = words
-    
+
     valid_words = sum(1 for word in sampled_words if english_dict.check(word))
     valid_percentage = valid_words / words_to_check
-    
+
     return valid_percentage >= threshold
+
 
 def decrypt_with_shift(ciphertext, shift):
     """
@@ -271,20 +299,21 @@ def decrypt_with_shift(ciphertext, shift):
 
     if termination_event.is_set():
         return None
-        
+
     decrypted = decrypt(ciphertext, shift)
     frequencies = count_letters(decrypted)
     score = calculate_frequency_score(frequencies)
-    
+
     result = {
-        'shift': shift,
-        'decrypted': decrypted,
-        'frequencies': frequencies,
-        'score': score,
-        'is_valid': validate_decryption(decrypted)
+        "shift": shift,
+        "decrypted": decrypted,
+        "frequencies": frequencies,
+        "score": score,
+        "is_valid": validate_decryption(decrypted),
     }
-    
+
     return result
+
 
 def decrypt_message(ciphertext):
     """
@@ -311,44 +340,49 @@ def decrypt_message(ciphertext):
         - The function uses a global termination_event to allow early termination.
     """
     termination_event.clear()
-    
+
     original_frequencies, original_score = analyze_text(ciphertext)
-    
+
     results = []
-    
+
     with ThreadPoolExecutor(max_workers=10) as executor:
         future_to_shift = {
-            executor.submit(decrypt_with_shift, ciphertext, shift): shift 
+            executor.submit(decrypt_with_shift, ciphertext, shift): shift
             for shift in range(26)
         }
-        
+
         for future in as_completed(future_to_shift):
             result = future.result()
             if result:
                 results.append(result)
-    
-    results.sort(key=lambda x: (x['is_valid'], x['score']), reverse=True)
-    
+
+    results.sort(key=lambda x: (x["is_valid"], x["score"]), reverse=True)
+
     best_match = results[0] if results else None
-    
+
     response = {
-        'original_frequencies': original_frequencies,
-        'original_score': original_score,
-        'results': results,
-        'best_match': best_match
+        "original_frequencies": original_frequencies,
+        "original_score": original_score,
+        "results": results,
+        "best_match": best_match,
     }
-    
+
     if best_match:
-        response['status'] = 'success'
-        if best_match['is_valid']:
-            response['message'] = f"Successfully decrypted with shift {best_match['shift']} (high confidence)"
+        response["status"] = "success"
+        if best_match["is_valid"]:
+            response["message"] = (
+                f"Successfully decrypted with shift {best_match['shift']} (high confidence)"
+            )
         else:
-            response['message'] = f"Possible decryption found with shift {best_match['shift']} (low confidence)"
+            response["message"] = (
+                f"Possible decryption found with shift {best_match['shift']} (low confidence)"
+            )
     else:
-        response['status'] = 'error'
-        response['message'] = "Unable to find any decryption results."
-    
+        response["status"] = "error"
+        response["message"] = "Unable to find any decryption results."
+
     return response
+
 
 def validate_input(text):
     """
@@ -365,6 +399,7 @@ def validate_input(text):
     """
 
     return any(cisalpha(char) for char in text)
+
 
 # Queue processor function
 # This runs in a separate thread to process decryption requests from the queue
@@ -390,11 +425,11 @@ def process_queue():
         except queue.Empty:
             # Timeout occurred, continue waiting
             continue
-        
+
         try:
             if task is None:  # Terminate the thread
                 break
-                
+
             ciphertext, callback = task
             result = decrypt_message(ciphertext)
             callback(result)
@@ -403,6 +438,7 @@ def process_queue():
         finally:
             # Mark the task as done, regardless of processing success
             decrypt_queue.task_done()
+
 
 # Start queue processor thread
 queue_thread = threading.Thread(target=process_queue, daemon=True)
