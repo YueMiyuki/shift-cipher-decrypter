@@ -50,6 +50,12 @@ This project implements a Shift Cipher Decrypter with a web-based user interface
 git clone https://github.com/yuemiyuki/shift-cipher-decrypter
 ```
 3. Start a python [venv](https://docs.python.org/3/library/venv.html)
+If you are on bash:
+```
+python3 -m pip install venv
+python3 -m venv ./venv
+source ./venv/bin/activate
+```
 4. Install dependencies
 ```
 pip install -r requirements.txt
