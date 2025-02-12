@@ -41,6 +41,8 @@ This project implements a Shift Cipher Decrypter with a web-based user interface
 - `requirements.txt`: pip requirements
 - `.gitignore`: Git ignore file
 - `LICENSE`: License file
+- `.env.example`: Environment example
+- `test_shift_cipher.py`: Test the core decryption logic
 
 
 ## Setup
@@ -66,6 +68,15 @@ python app.py
 ```
 6. Visit the address shown in the console
 
+## Running the Tests
+1. Run the following command:
+```
+python -m unittest test_shift_cipher.py
+```
 
-## Known issues
-1. When multiple request is made quickly, the backend returns a wrong output (#1)
+2. The test results will be displayed in the terminal. You should see output indicating which tests passed or failed.
+
+## Understanding the Test Results
+
+- If all tests pass, you'll see a message like "OK" followed by the number of tests run.
+- If any tests fail, you'll see "FAILED" messages with details about which tests failed and why.

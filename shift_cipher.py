@@ -217,10 +217,15 @@ def validate_decryption(decrypted, sample_size=10, threshold=0.7):
         bool: True if the percentage of valid words is above the threshold, False otherwise.
 
     Note:
-        This function uses a random sampling approach to check words against an English dictionary.
-        It's designed to provide a balanced assessment of decryption validity, especially for longer texts.
+        This function cleans each word by removing non-alphabetic characters before validation.
     """
-    words = [word.lower() for word in decrypted.split() if word.isalpha()]
+    # Clean each word by removing non-alphabetic characters and convert to lowercase
+    words = []
+    for word in decrypted.split():
+        cleaned_word = ''.join([c for c in word if cisalpha(c)])
+        if cleaned_word:
+            words.append(cleaned_word.lower())
+    
     total_words = len(words)
     
     if total_words == 0:
