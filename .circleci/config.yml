@@ -19,7 +19,7 @@ jobs:
       # Checkout the code as the first step.
       - checkout
       - run: ls -larth
-      - run: sudo apt-get update && sudo apt-get install python3 curl
+      - run: sudo apt-get update && sudo apt-get install python3 curl libenchant2
       - run: curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py 
       - run: python get-pip.py
       - run: python -m pip install -r requirements.txt
