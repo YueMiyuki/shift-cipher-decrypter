@@ -14,6 +14,9 @@ import queue
 # English dictionary for word validation
 import enchant
 
+# Random
+import random
+
 # Global queue for decryption requests
 decrypt_queue = queue.Queue()
 # Event to signal early termination
@@ -200,42 +203,41 @@ def analyze_text(text):
     score = calculate_frequency_score(frequencies)
     return frequencies, score
 
-def validate_decryption(decrypted):
+def validate_decryption(decrypted, sample_size=10, threshold=0.7):
     """
-    Validate a decrypted text by checking if it contains valid English words.
-
-    This function checks if a significant portion of the words in the
-    decrypted text are valid English words.
+    Validate a decrypted text by randomly sampling words and checking against an English dictionary.
 
     Args:
         decrypted (str): The decrypted text to be validated.
+        sample_size (int, optional): The number of words to sample for validation. Defaults to 10.
+        threshold (float, optional): The minimum percentage of valid words required to consider
+                                     the decryption valid. Defaults to 0.7 (70%).
 
     Returns:
-        bool: True if the text is considered valid, False otherwise.
+        bool: True if the percentage of valid words is above the threshold, False otherwise.
 
     Note:
-        - For texts with more than 5 words, it checks the first 5 words.
-        - For texts with 3-5 words, it checks the first 3 words.
-        - For texts with 1-2 words, it checks all words.
-        - The function uses a global english_dict object for word validation.
+        This function uses a random sampling approach to check words against an English dictionary.
+        It's designed to provide a balanced assessment of decryption validity, especially for longer texts.
     """
+    words = [word.lower() for word in decrypted.split() if word.isalpha()]
+    total_words = len(words)
+    
+    if total_words == 0:
+        return False
+    
+    words_to_check = min(sample_size, total_words)
+    
+    if total_words > sample_size:
+        sampled_words = random.sample(words, words_to_check)
+    else:
+        sampled_words = words
+    
+    valid_words = sum(1 for word in sampled_words if english_dict.check(word))
+    valid_percentage = valid_words / words_to_check
+    
+    return valid_percentage >= threshold
 
-    if len(decrypted.split()) > 5:
-        words = [word.lower() for word in decrypted.split() if word.isalpha()]
-        valid_words = sum(1 for word in words[:5] if english_dict.check(word))  # Check up to first 5 words
-        return valid_words >= 5  # Consider valid if at least 5 words are valid
-    # Case that fix short sentence
-    elif len(decrypted.split()) <= 5 and len(decrypted.split()) > 2:
-        words = [word.lower() for word in decrypted.split() if word.isalpha()]
-        valid_words = sum(1 for word in words[:3] if english_dict.check(word))
-        return valid_words >= 2
-    elif len(decrypted.split()) <= 2:
-        words = [word.lower() for word in decrypted.split() if word.isalpha()]
-        valid_words = sum(1 for word in words[:2] if english_dict.check(word))
-        return valid_words >= 1
-
-# Function to decrypt with a specific shift and analyze the result
-# This is used by the multithreading process to test each possible shift
 def decrypt_with_shift(ciphertext, shift):
     """
     Decrypt the ciphertext with a specific shift and analyze the result.
@@ -295,7 +297,7 @@ def decrypt_message(ciphertext):
               - original_score: Frequency score of the original text.
               - results: List of all decryption attempts and their analyses.
               - best_match: The most likely correct decryption.
-              - status: 'success' if a valid decryption was found, 'error' otherwise.
+              - status: 'success' if a decryption was found, 'error' otherwise.
               - message: A descriptive message about the decryption result.
 
     Note:
@@ -303,17 +305,12 @@ def decrypt_message(ciphertext):
         - It sorts the results based on validity and score to determine the best match.
         - The function uses a global termination_event to allow early termination.
     """
-
-    # Reset termination event
     termination_event.clear()
     
-    # Analyze original text
     original_frequencies, original_score = analyze_text(ciphertext)
     
-    # Initialize results list
     results = []
     
-    # Try all possible shifts using multithreading
     with ThreadPoolExecutor(max_workers=10) as executor:
         future_to_shift = {
             executor.submit(decrypt_with_shift, ciphertext, shift): shift 
@@ -325,25 +322,26 @@ def decrypt_message(ciphertext):
             if result:
                 results.append(result)
     
-    # Sort results by score and validity
     results.sort(key=lambda x: (x['is_valid'], x['score']), reverse=True)
     
-    # Find the best valid result
     best_match = results[0] if results else None
     
     response = {
         'original_frequencies': original_frequencies,
         'original_score': original_score,
-        'results': results,  # Return all results
+        'results': results,
         'best_match': best_match
     }
     
-    if best_match and best_match['is_valid']:
+    if best_match:
         response['status'] = 'success'
-        response['message'] = f"Successfully decrypted with shift {best_match['shift']}"
+        if best_match['is_valid']:
+            response['message'] = f"Successfully decrypted with shift {best_match['shift']} (high confidence)"
+        else:
+            response['message'] = f"Possible decryption found with shift {best_match['shift']} (low confidence)"
     else:
         response['status'] = 'error'
-        response['message'] = "Unable to find a valid decryption, but here is a result that have the highest confidence."
+        response['message'] = "Unable to find any decryption results."
     
     return response
 
