@@ -1,0 +1,52 @@
+# Shift Cipher Decrypter
+
+This project implements a Shift Cipher Decrypter with a web-based user interface. It uses Python for the backend logic and HTML/CSS/JavaScript for the frontend.
+
+## Features
+
+- Decrypts shift ciphers (Caesar ciphers) automatically
+- Uses letter frequency analysis for efficient decryption
+- Validates decrypted words using an external dictionary API
+- Provides a user-friendly web interface
+- Supports drag-and-drop file input
+- Displays multiple possible decryptions
+- Allows downloading of decrypted text
+
+## How it works
+
+1. The program analyzes the frequency of letters in the ciphertext.
+2. It tries decryption using the most common English letters first, improving efficiency.
+3. For each attempt, it validates the first few words using a dictionary API.
+4. It displays up to 8 possible decryptions, sorted by likelihood.
+5. The user can select any of the displayed decryptions or download the suggested one.
+
+## Dependencies
+
+- Python 3.7+
+- Flask
+- Requests
+
+## File Structure
+
+- `app.py`: Main Flask application
+- `shift_cipher.py`: Core decryption logic
+- `templates/`: Contains HTML templates
+  - `index.html`: Main page template
+  - `README.md`: Frontend documentation
+
+## Setup
+1. You need python installed
+2. clone the repository:
+```
+git clone https://github.com/yuemiyuki/shift-cipher-decrypter
+```
+3. Start a python [venv](https://docs.python.org/3/library/venv.html)
+4. Install dependencies
+```
+pip install -r requirements.txt
+```
+5. Start the app
+```
+python app.py
+```
+6. Visit the address shown in the console

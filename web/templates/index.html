@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shift Cipher Decrypter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+</head>
+
+<body class="light-mode">
+    <button id="mode-toggle" aria-label="Toggle theme">
+        <!-- Theme toggle button -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5" />
+            <line x1="12" y1="1" x2="12" y2="3" />
+            <line x1="12" y1="21" x2="12" y2="23" />
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+            <line x1="1" y1="12" x2="3" y2="12" />
+            <line x1="21" y1="12" x2="23" y2="12" />
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+        </svg>
+    </button>
+    <div class="container">
+        <h1>Shift Cipher Decrypter</h1>
+        <div class="input-area">
+            <textarea id="input" placeholder="Enter your ciphertext here"></textarea>
+        </div>
+        <div id="dropzone">
+            Drag and drop a text file here
+        </div>
+        <button id="decrypt">Decrypt</button>
+        <div class="loading"></div>
+        <div id="result"></div>
+        <div class="output-area">
+            <h3>Decrypted Text:</h3>
+            <textarea id="output" readonly></textarea>
+            <button id="download">Download Decrypted Text</button>
+        </div>
+        <div id="possible-results">
+            <h3>Possible Decryptions</h3>
+            <table class="results-table">
+                <thead>
+                    <tr>
+                        <th>Shift Key</th>
+                        <th>Confidence</th>
+                        <th>Decrypted Text</th>
+                    </tr>
+                </thead>
+                <tbody id="results-body"></tbody>
+            </table>
+            <p class="table-comment">The highlighted item include valid english words.</p>
+        </div>
+    </div>
+    <script>
+        const input = document.getElementById('input');
+        const output = document.getElementById('output');
+        const result = document.getElementById('result');
+        const decryptBtn = document.getElementById('decrypt');
+        const downloadBtn = document.getElementById('download');
+        const dropzone = document.getElementById('dropzone');
+        const loading = document.querySelector('.loading');
+        const modeToggle = document.getElementById('mode-toggle');
+        const body = document.body;
+        const resultsBody = document.getElementById('results-body');
+
+        // Easter egg: 5 clicks on background to GitHub
+        let easterEggCount = 0;
+        let easterEggTimeout;
+
+        document.body.addEventListener('click', (e) => {
+            if (e.target.tagName === 'BODY') {
+
+                easterEggCount++;
+                if (easterEggCount === 5) {
+                    window.open('https://github.com/YueMiyuki').focus();
+                }
+                clearTimeout(easterEggTimeout);
+                easterEggTimeout = setTimeout(() => {
+                    easterEggCount = 0;
+                }, 2000);
+            }
+
+        });
+
+        // Animations
+        document.querySelectorAll('.container, button, #dropzone')
+            .forEach(element => {
+                element.style.willChange = 'transform';
+            });
+
+        function displayResults(data) {
+            resultsBody.innerHTML = '';
+            data.results.forEach((r, index) => {
+                if (index < 8) {
+                    const row = resultsBody.insertRow();
+                    row.style.animation = `fadeIn 0.3s ease-out ${index * 0.1}s`;
+                    row.innerHTML = `
+                        <td>${r.shift}</td>
+                        <td>${Math.round(r.score)}</td>
+                        <td>${r.decrypted}</td>
+                    `;
+                    if (r.is_valid) {
+                        row.classList.add('selected');
+                    }
+                }
+            });
+        }
+
+        async function decrypt() {
+            const ciphertext = input.value.trim();
+            if (!ciphertext) {
+                result.textContent = 'Please enter some text to decrypt.';
+                result.className = 'error';
+                return;
+            }
+
+            decryptBtn.style.animation = 'pulse 0.5s ease';
+            loading.style.display = 'block';
+            result.textContent = '';
+            result.className = '';
+            output.value = '';
+
+            try {
+                const response = await fetch('/decrypt', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ ciphertext }),
+                });
+
+                const data = await response.json();
+                result.textContent = data.message;
+                result.className = data.status;
+
+                if (data.best_match) {
+                    output.value = data.best_match.decrypted;
+                    output.style.animation = 'fadeIn 0.5s ease-out';
+                }
+
+                displayResults(data);
+            } catch (error) {
+                result.textContent = 'An error occurred while decrypting the message.';
+                result.className = 'error';
+            } finally {
+                loading.style.display = 'none';
+                decryptBtn.style.animation = '';
+            }
+        }
+
+        function downloadDecrypted() {
+            const text = output.value;
+            if (!text) {
+                alert('No decrypted text to download.');
+                return;
+            }
+            downloadBtn.style.animation = 'pulse 0.5s ease';
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'decrypted_text.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            setTimeout(() => {
+                downloadBtn.style.animation = '';
+            }, 500);
+        }
+
+        function setInitialTheme() {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                body.classList.remove('light-mode');
+                body.classList.add('dark-mode');
+                updateThemeIcon();
+            }
+        }
+
+        function updateThemeIcon() {
+            const button = document.getElementById('mode-toggle');
+            const isDark = body.classList.contains('dark-mode');
+            button.innerHTML = isDark ?
+                `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>` :
+                `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+        }
+
+        decryptBtn.addEventListener('click', decrypt);
+        downloadBtn.addEventListener('click', downloadDecrypted);
+
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('dragover');
+        });
+
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('dragover');
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    input.value = e.target.result;
+                    input.style.animation = 'fadeIn 0.5s ease-out';
+                    setTimeout(() => {
+                        input.style.animation = '';
+                    }, 500);
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        function createGridAndRays() {
+            // Create grid background
+            const grid = document.createElement('div');
+            grid.className = 'grid-background';
+            document.body.appendChild(grid);
+
+            // Create light rays with better positioning
+            function createRay() {
+                const ray = document.createElement('div');
+                ray.className = 'light-ray';
+                ray.style.left = `${Math.random() * 100}%`;
+                ray.style.top = `${Math.random() * 100}%`;
+                ray.style.transform = `translate(-50%, -50%) rotate(${Math.random() * 360}deg)`;
+                document.body.appendChild(ray);
+            }
+
+            // Create multiple rays
+            for (let i = 0; i < 4; i++) {
+                createRay();
+            }
+        }
+
+        // Update theme toggle handler
+        modeToggle.addEventListener('click', () => {
+            body.classList.toggle('light-mode');
+            body.classList.toggle('dark-mode');
+            // Force redraw of rays
+            document.querySelectorAll('.light-ray').forEach(ray => ray.remove());
+            createGridAndRays();
+            updateThemeIcon();
+        });
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            setInitialTheme();
+            createGridAndRays();
+            document.body.style.opacity = '0';
+            setTimeout(() => {
+                document.body.style.transition = 'opacity 0.5s ease';
+                document.body.style.opacity = '1';
+            }, 0);
+        });
+
+        window.addEventListener('load', createGridAndRays);
+    </script>
+</body>
+
+</html>
