@@ -1,9 +1,9 @@
-# =================================================================
-# Licensed under the Apache License, Version 2.0 (the "License");
+# ==========================================================================
+# Licensed under the GNU General Public License, Version 3 (the "License");
 # You may not use this file except in compliance with the License.
 # Song Hei Chi - 2025
 # http://github.com/YueMiyuki
-# =================================================================
+# ==========================================================================
 from collections import Counter
 
 # Used for multi threading
@@ -52,7 +52,7 @@ def ccase(char, to_upper=False):
         str: The converted character. If the input character is already in the desired case,
              it is returned as is.
     """
-    
+
     if 'A' <= char <= 'Z' and not to_upper:
         return chr(ord(char) + 32)
     elif 'a' <= char <= 'z' and to_upper:
