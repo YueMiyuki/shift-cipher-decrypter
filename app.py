@@ -1,6 +1,10 @@
 from flask import Flask, render_template, request, jsonify
 from shift_cipher import decrypt_queue, validate_input
 import threading
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Define static directory
 app = Flask(__name__,
@@ -40,6 +44,8 @@ def decrypt():
         
     return jsonify(result)
 
+# Define port and host to run the app on
+port = os.environ.get('PORT', 5000)
 
 # Run the app
 # Define port and host to run the app on
@@ -50,4 +56,4 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     
     # Start the server with Waitress
-    serve(app, host="0.0.0.0", port=5123)
+    serve(app, host="0.0.0.0", port=port)

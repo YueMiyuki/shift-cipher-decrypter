@@ -65,3 +65,7 @@ pip install -r requirements.txt
 python app.py
 ```
 6. Visit the address shown in the console
+
+
+## Known issues
+1. When multiple request is made quickly, the backend returns a wrong output (#1)

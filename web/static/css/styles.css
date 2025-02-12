@@ -390,7 +390,7 @@ button:active {
 }
 
 .results-table tr.selected {
-    background-color: rgba(33, 150, 243, 0.1);
+    background-color: rgba(248, 226, 226, 0.136);
 }
 
 #download {
