@@ -20,7 +20,6 @@ jobs:
       - checkout
       - run: ls
       - run: sudo apt-get update && sudo apt-get install python3
-      - run: python -m ensurepip --upgrade
       - run: python -m pip insatll unittest && python -m pip install -r requirements.txt
       - run: python -m unittest .
 
