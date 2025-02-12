@@ -30,9 +30,18 @@ This project implements a Shift Cipher Decrypter with a web-based user interface
 
 - `app.py`: Main Flask application
 - `shift_cipher.py`: Core decryption logic
-- `templates/`: Contains HTML templates
-  - `index.html`: Main page template
-  - `README.md`: Frontend documentation
+- `web/`: Contains web application
+  - `static/`: Contains static files
+    - `css/`: Contains CSS Stylesheet
+      - `style.css`: CSS Stylesheet
+  - `templates/`: Contain HTML Template
+    - `index.html`: Frontend code
+    - `README.md`: Frontend documentation
+- `README.md`:  Main documentation
+- `requirements.txt`: pip requirements
+- `.gitignore`: Git ignore file
+- `LICENSE`: License file
+
 
 ## Setup
 1. You need python installed

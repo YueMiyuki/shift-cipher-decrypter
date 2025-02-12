@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify
 from shift_cipher import decrypt_queue, validate_input
 import threading
 
+# Define static directory
 app = Flask(__name__,
             static_url_path='', 
             static_folder='web/static',

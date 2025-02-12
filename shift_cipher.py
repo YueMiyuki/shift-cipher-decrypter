@@ -404,3 +404,6 @@ def process_queue():
 # Start queue processor thread
 queue_thread = threading.Thread(target=process_queue, daemon=True)
 queue_thread.start()
+
+# Miyuki Yue, 2025
+# https://github.com/YueMiyuki
