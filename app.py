@@ -1,8 +1,10 @@
 from flask import Flask, render_template, request, jsonify
-from shift_cipher import decrypt_queue, validate_input
+from shift_cipher import decrypt_message, validate_input, termination_event
 import threading
 import os
 from dotenv import load_dotenv
+from concurrent.futures import ThreadPoolExecutor
+import queue
 
 load_dotenv()
 
@@ -11,6 +13,9 @@ app = Flask(__name__,
             static_url_path='', 
             static_folder='web/static',
             template_folder='web/templates')
+
+# Create a ThreadPoolExecutor
+executor = ThreadPoolExecutor(max_workers=5)
 
 @app.route('/')
 def index():
@@ -23,32 +28,34 @@ def decrypt():
     if not validate_input(ciphertext):
         return jsonify({'error': 'Invalid input. Please enter text containing letters.'}), 400
     
-    # Create an Event to wait for the result
-    result_ready = threading.Event()
-    result = {}
+    # Create a new queue for this specific request
+    result_queue = queue.Queue()
     
-    def callback(decrypt_result):
-        nonlocal result
-        result = decrypt_result
-        result_ready.set()
+    # Submit task to the executor
+    future = executor.submit(process_decryption, ciphertext, result_queue)
     
-    # Add task to queue
-    decrypt_queue.put((ciphertext, callback))
-    
-    # Wait for result (with timeout)
-    if not result_ready.wait(timeout=30):
+    try:
+        # Wait for result (with timeout)
+        result = result_queue.get(timeout=30)
+        return jsonify(result)
+    except queue.Empty:
+        # Cancel the future if it's still running
+        future.cancel()
+        termination_event.set()  # Signal early termination
         return jsonify({'error': 'Decryption timeout'}), 408
-    
-    if 'error' in result:
-        return jsonify(result), 400
-        
-    return jsonify(result)
+
+def process_decryption(ciphertext, result_queue):
+    try:
+        # Directly call decrypt_message instead of using a global queue
+        result = decrypt_message(ciphertext)
+        result_queue.put(result)
+    except Exception as e:
+        result_queue.put({'error': str(e)})
 
 # Define port and host to run the app on
 port = os.environ.get('PORT', 5000)
 
 # Run the app
-# Define port and host to run the app on
 if __name__ == "__main__":
     import logging
     from waitress import serve
