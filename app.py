@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, jsonify
 from shift_cipher import decrypt_message, validate_input, termination_event
-import threading
 import os
 from dotenv import load_dotenv
 from concurrent.futures import ThreadPoolExecutor
@@ -62,7 +61,7 @@ def process_decryption(ciphertext, result_queue):
 
 
 # Define port and host to run the app on
-port = os.environ.get("PORT", 5000)
+PORT = os.environ.get("PORT", 5000)
 
 # Run the app
 if __name__ == "__main__":
@@ -73,4 +72,4 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
     # Start the server with Waitress
-    serve(app, host="0.0.0.0", port=port)
+    serve(app, host="0.0.0.0", port=PORT)
