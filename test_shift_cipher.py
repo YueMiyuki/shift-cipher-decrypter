@@ -1,8 +1,6 @@
 import unittest
 import sys
 
-sys.path.append("../")
-
 from shift_cipher import (
     ccase,
     cisalpha,

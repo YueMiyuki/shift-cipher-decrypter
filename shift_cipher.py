@@ -56,8 +56,7 @@ ENGLISH_FREQUENCIES = {
 }
 
 # Precompute the maximum possible sum of differences
-# Sum of English frequencies plus 100% for non-English letters
-max_sum = sum(ENGLISH_FREQUENCIES.values()) + 100
+max_sum = sum(ENGLISH_FREQUENCIES.values())
 
 
 def ccase(char, to_upper=False):
@@ -339,13 +338,16 @@ def decrypt_message(ciphertext):
         - It sorts the results based on validity and score to determine the best match.
         - The function uses a global termination_event to allow early termination.
     """
+    # Clear the termination event flag
+    # Prevents early termination from previous runs
     termination_event.clear()
 
     original_frequencies, original_score = analyze_text(ciphertext)
 
     results = []
 
-    with ThreadPoolExecutor(max_workers=10) as executor:
+    # Create a ThreadPoolExecutor with 26 threads to test all possible shifts concurrently
+    with ThreadPoolExecutor(max_workers=26) as executor:
         future_to_shift = {
             executor.submit(decrypt_with_shift, ciphertext, shift): shift
             for shift in range(26)
@@ -400,9 +402,6 @@ def validate_input(text):
 
     return any(cisalpha(char) for char in text)
 
-
-# Queue processor function
-# This runs in a separate thread to process decryption requests from the queue
 def process_queue():
     """
     Process decryption requests from a queue in a separate thread.
