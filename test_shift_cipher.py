@@ -43,14 +43,23 @@ class TestShiftCipher(unittest.TestCase):
         score = calculate_frequency_score(frequencies)
         self.assertTrue(0 <= score <= 100)
 
-    def test_validate_decryption(self):
-        self.assertTrue(validate_decryption("This is a valid English sentence"))
-        self.assertFalse(validate_decryption("Xlmw mw rsx e zepmh Irkpmwl wirxirgi"))
-
     def test_decrypt_with_shift(self):
         result = decrypt_with_shift("Khoor, Zruog!", 3)
         self.assertEqual(result["decrypted"], "Hello, World!")
         self.assertTrue(result["is_valid"])
+
+def test_validate_decryption(self):
+    # Test with a valid English sentence
+    result = validate_decryption("This is a valid English sentence")
+    self.assertTrue(result[0])  # sample_valid
+    self.assertTrue(result[1])  # any_valid
+    self.assertEqual(result[2], [True, True, True, True, True])
+
+    # Test with an invalid sentence
+    result = validate_decryption("Xlmw mw rsx e zepmh Irkpmwl wirxirgi")
+    self.assertFalse(result[0])  # sample_valid
+    self.assertFalse(result[1])  # any_valid
+    self.assertEqual(result[2], [False, False, False, False, False, False, False])
 
 
 if __name__ == "__main__":

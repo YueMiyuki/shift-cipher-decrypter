@@ -393,6 +393,27 @@ button:active {
     background-color: rgba(248, 226, 226, 0.136);
 }
 
+.high-confidence {
+    background-color: rgba(76, 175, 80, 0.1);
+    border-left: 4px solid #4CAF50;
+}
+
+.low-confidence {
+    background-color: rgba(255, 68, 68, 0.1);
+    border-left: 4px solid #ff4444;
+}
+
+.valid-word {
+    text-decoration: underline;
+    text-decoration-color: #4CAF50;
+    text-decoration-thickness: 2px;
+}
+
+.copied {
+    background-color: rgba(33, 150, 243, 0.2) !important;
+    transition: background-color 0.3s ease;
+}
+
 #download {
     background: linear-gradient(45deg, #2196F3, #1976D2);
     margin-top: 1rem;

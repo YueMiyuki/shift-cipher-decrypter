@@ -65,8 +65,8 @@
         const dropzone = document.getElementById('dropzone');
         const loading = document.querySelector('.loading');
         const modeToggle = document.getElementById('mode-toggle');
-        const body = document.body;
         const resultsBody = document.getElementById('results-body');
+        const body = document.body;
 
         // Easter egg: 5 clicks on background to GitHub
         let easterEggCount = 0;
@@ -96,21 +96,41 @@
         function displayResults(data) {
             resultsBody.innerHTML = '';
             data.results.forEach((r, index) => {
-                if (index < 8) {
-                    const row = resultsBody.insertRow();
-                    row.style.animation = `fadeIn 0.3s ease-out ${index * 0.1}s`;
-                    row.innerHTML = `
-                        <td>${r.shift}</td>
-                        <td>${Math.round(r.score)}</td>
-                        <td>${r.decrypted}</td>
-                    `;
-                    if (r.is_valid) {
-                        row.classList.add('selected');
-                    }
-                    if (r.score > 80) {
-                        row.classList.add('selected');
-                    }
+                const row = resultsBody.insertRow();
+                row.style.animation = `fadeIn 0.3s ease-out ${index * 0.1}s`;
+
+                // Split and highlight valid words
+                const words = r.decrypted.split(/\s+/).filter(word => word.length > 0);
+                const validFlags = r.valid_words_info || [];
+                const highlighted = words.map((word, idx) =>
+                    validFlags[idx] ? `<span class="valid-word">${word}</span>` : word
+                ).join(' ');
+
+                row.innerHTML = `
+                <td>${r.shift}</td>
+                <td>${Math.round(r.score)}</td>
+                <td id="decryptItem">${highlighted}</td>
+            `;
+
+                if (r.is_valid) {
+                    row.classList.add('high-confidence');
+                } else if (r.has_any_valid) {
+                    row.classList.add('low-confidence');
                 }
+
+                row.addEventListener('click', () => {
+                    // Would not work on localhost
+                    // "As with many new APIs, the Clipboard API is only supported for pages served over HTTPS."
+                    // https://web.dev/articles/async-clipboard
+                    navigator.clipboard.writeText(r.decrypted)
+                        .then(() => {
+                            row.classList.add('copied');
+                            setTimeout(() => row.classList.remove('copied'), 1000);
+                        })
+                        .catch(err => {
+                            console.error('Failed to copy text: ', err);
+                        });
+                });
             });
         }
 

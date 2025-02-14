@@ -228,47 +228,44 @@ def analyze_text(text):
     score = calculate_frequency_score(frequencies)
     return frequencies, score
 
-
 def validate_decryption(decrypted, sample_size=10, threshold=0.7):
     """
-    Validate a decrypted text by randomly sampling words and checking against an English dictionary.
+    Validate the decrypted text by checking the percentage of valid English words.
 
     Args:
-        decrypted (str): The decrypted text to be validated.
-        sample_size (int, optional): The number of words to sample for validation. Defaults to 10.
-        threshold (float, optional): The minimum percentage of valid words required to consider
-                                     the decryption valid. Defaults to 0.7 (70%).
+        decrypted (str): The decrypted text to validate.
+        sample_size (int, optional): Number of words to sample for validation. Defaults to 10.
+        threshold (float, optional): Threshold of valid words required. Defaults to 0.7.
 
     Returns:
-        bool: True if the percentage of valid words is above the threshold, False otherwise.
-
-    Note:
-        This function cleans each word by removing non-alphabetic characters before validation.
+        tuple: (sample_valid, any_valid, valid_words_info)
+            - sample_valid (bool): Sample meets threshold.
+            - any_valid (bool): Any valid words in text.
+            - valid_words_info (list[bool]): Validity of each cleaned word.
     """
-    # Clean each word by removing non-alphabetic characters and convert to lowercase
-    words = []
-    for word in decrypted.split():
-        cleaned_word = "".join([c for c in word if cisalpha(c)])
-        if cleaned_word:
-            words.append(cleaned_word.lower())
+    all_words = decrypted.split()
+    cleaned_words = []
+    valid_flags = []
+    for word in all_words:
+        cleaned = "".join([c for c in word if cisalpha(c)]).lower()
+        cleaned_words.append(cleaned)
+        is_valid = english_dict.check(cleaned) if cleaned else False
+        valid_flags.append(is_valid)
+    
+    if not cleaned_words:
+        return (False, False, [])
 
-    total_words = len(words)
-
-    if total_words == 0:
-        return False
-
-    words_to_check = min(sample_size, total_words)
-
-    if total_words > sample_size:
-        sampled_words = random.sample(words, words_to_check)
+    has_any_valid = any(valid_flags)
+    words_to_check = min(sample_size, len(cleaned_words))
+    
+    if len(cleaned_words) > sample_size:
+        sampled_indices = random.sample(range(len(cleaned_words)), words_to_check)
     else:
-        sampled_words = words
-
-    valid_words = sum(1 for word in sampled_words if english_dict.check(word))
-    valid_percentage = valid_words / words_to_check
-
-    return valid_percentage >= threshold
-
+        sampled_indices = list(range(len(cleaned_words)))
+    
+    valid_count = sum(valid_flags[i] for i in sampled_indices)
+    valid_percentage = valid_count / words_to_check
+    return (valid_percentage >= threshold, has_any_valid, valid_flags)
 
 def decrypt_with_shift(ciphertext, shift):
     """
@@ -288,6 +285,8 @@ def decrypt_with_shift(ciphertext, shift):
               - frequencies: Letter frequencies in the decrypted text.
               - score: The calculated frequency score.
               - is_valid: Boolean indicating if the decryption is valid.
+              - has_any_valid: Boolean indicating if any valid words were found.
+              - valid_words_info: List of validity flags for each cleaned word.
 
     Note:
         - This function checks a global termination_event to allow early
@@ -303,12 +302,16 @@ def decrypt_with_shift(ciphertext, shift):
     frequencies = count_letters(decrypted)
     score = calculate_frequency_score(frequencies)
 
+    is_valid, has_any_valid, valid_words_info = validate_decryption(decrypted)
+
     result = {
         "shift": shift,
         "decrypted": decrypted,
         "frequencies": frequencies,
         "score": score,
-        "is_valid": validate_decryption(decrypted),
+        "is_valid": is_valid,
+        "has_any_valid": has_any_valid,
+        "valid_words_info": valid_words_info,
     }
 
     return result
@@ -358,7 +361,15 @@ def decrypt_message(ciphertext):
             if result:
                 results.append(result)
 
-    results.sort(key=lambda x: (x["is_valid"], x["score"]), reverse=True)
+    # Check if any decryption results have at least one valid word
+    results.sort(
+        key=lambda x: (
+            x["is_valid"],
+            sum(x["valid_words_info"]) if not x["is_valid"] else 0,
+            x["score"]
+        ),
+        reverse=True
+    )
 
     best_match = results[0] if results else None
 
