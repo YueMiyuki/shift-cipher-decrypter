@@ -285,6 +285,8 @@ def decrypt_with_shift(ciphertext, shift):
               - frequencies: Letter frequencies in the decrypted text.
               - score: The calculated frequency score.
               - is_valid: Boolean indicating if the decryption is valid.
+              - has_any_valid: Boolean indicating if any valid words were found.
+              - valid_words_info: List of validity flags for each cleaned word.
 
     Note:
         - This function checks a global termination_event to allow early
