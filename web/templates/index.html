@@ -66,7 +66,6 @@
         const loading = document.querySelector('.loading');
         const modeToggle = document.getElementById('mode-toggle');
         const resultsBody = document.getElementById('results-body');
-        const decryptItem = document.getElementById('decryptItem');
         const body = document.body;
 
         // Easter egg: 5 clicks on background to GitHub
@@ -118,6 +117,20 @@
                 } else if (r.has_any_valid) {
                     row.classList.add('low-confidence');
                 }
+
+                row.addEventListener('click', () => {
+                    // Would not work on localhost
+                    // "As with many new APIs, the Clipboard API is only supported for pages served over HTTPS."
+                    // https://web.dev/articles/async-clipboard
+                    navigator.clipboard.writeText(r.decrypted)
+                        .then(() => {
+                            row.classList.add('copied');
+                            setTimeout(() => row.classList.remove('copied'), 1000);
+                        })
+                        .catch(err => {
+                            console.error('Failed to copy text: ', err);
+                        });
+                });
             });
         }
 
@@ -271,15 +284,6 @@
                 document.body.style.opacity = '1';
             }, 0);
         });
-
-        // Copy decrypted text to clipboard on click
-        decryptItem.addEventListener('click', () => {
-                    navigator.clipboard.writeText(r.decrypted)
-                        .then(() => {
-                            row.classList.add('copied');
-                            setTimeout(() => row.classList.remove('copied'), 1000);
-                        });
-                });
 
         window.addEventListener('load', createGridAndRays);
     </script>

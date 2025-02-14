@@ -362,7 +362,14 @@ def decrypt_message(ciphertext):
                 results.append(result)
 
     # Check if any decryption results have at least one valid word
-    results.sort(key=lambda x: (x["is_valid"], x["has_any_valid"], x["score"]), reverse=True)  
+    results.sort(
+        key=lambda x: (
+            x["is_valid"],
+            sum(x["valid_words_info"]) if not x["is_valid"] else 0,
+            x["score"]
+        ),
+        reverse=True
+    )
 
     best_match = results[0] if results else None
 
