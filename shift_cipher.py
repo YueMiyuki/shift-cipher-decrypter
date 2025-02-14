@@ -228,47 +228,26 @@ def analyze_text(text):
     score = calculate_frequency_score(frequencies)
     return frequencies, score
 
-
 def validate_decryption(decrypted, sample_size=10, threshold=0.7):
-    """
-    Validate a decrypted text by randomly sampling words and checking against an English dictionary.
-
-    Args:
-        decrypted (str): The decrypted text to be validated.
-        sample_size (int, optional): The number of words to sample for validation. Defaults to 10.
-        threshold (float, optional): The minimum percentage of valid words required to consider
-                                     the decryption valid. Defaults to 0.7 (70%).
-
-    Returns:
-        bool: True if the percentage of valid words is above the threshold, False otherwise.
-
-    Note:
-        This function cleans each word by removing non-alphabetic characters before validation.
-    """
-    # Clean each word by removing non-alphabetic characters and convert to lowercase
     words = []
     for word in decrypted.split():
         cleaned_word = "".join([c for c in word if cisalpha(c)])
         if cleaned_word:
             words.append(cleaned_word.lower())
-
-    total_words = len(words)
-
-    if total_words == 0:
-        return False
-
-    words_to_check = min(sample_size, total_words)
-
-    if total_words > sample_size:
-        sampled_words = random.sample(words, words_to_check)
-    else:
-        sampled_words = words
-
+    
+    if not words:
+        return False, False
+    
+    # Check if any word in the entire list is valid
+    has_any_valid = any(english_dict.check(word) for word in words)
+    
+    # Original sample validation
+    words_to_check = min(sample_size, len(words))
+    sampled_words = random.sample(words, words_to_check) if len(words) > sample_size else words
     valid_words = sum(1 for word in sampled_words if english_dict.check(word))
     valid_percentage = valid_words / words_to_check
-
-    return valid_percentage >= threshold
-
+    
+    return (valid_percentage >= threshold, has_any_valid)  # Modified to return tuple
 
 def decrypt_with_shift(ciphertext, shift):
     """
@@ -303,12 +282,15 @@ def decrypt_with_shift(ciphertext, shift):
     frequencies = count_letters(decrypted)
     score = calculate_frequency_score(frequencies)
 
+    is_valid, has_any_valid = validate_decryption(decrypted)
+
     result = {
         "shift": shift,
         "decrypted": decrypted,
         "frequencies": frequencies,
         "score": score,
-        "is_valid": validate_decryption(decrypted),
+        "is_valid": is_valid,
+        "has_any_valid": has_any_valid,
     }
 
     return result
@@ -358,7 +340,8 @@ def decrypt_message(ciphertext):
             if result:
                 results.append(result)
 
-    results.sort(key=lambda x: (x["is_valid"], x["score"]), reverse=True)
+    # Check if any decryption results have at least one valid word
+    results.sort(key=lambda x: (x["is_valid"], x["has_any_valid"], x["score"]), reverse=True)  
 
     best_match = results[0] if results else None
 

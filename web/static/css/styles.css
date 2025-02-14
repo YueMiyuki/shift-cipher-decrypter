@@ -393,6 +393,16 @@ button:active {
     background-color: rgba(248, 226, 226, 0.136);
 }
 
+.high-confidence {
+    background-color: rgba(76, 175, 80, 0.1);
+    border-left: 4px solid #4CAF50;
+}
+
+.low-confidence {
+    background-color: rgba(255, 68, 68, 0.1);
+    border-left: 4px solid #ff4444;
+}
+
 #download {
     background: linear-gradient(45deg, #2196F3, #1976D2);
     margin-top: 1rem;

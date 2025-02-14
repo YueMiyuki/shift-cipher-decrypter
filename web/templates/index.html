@@ -100,15 +100,15 @@
                     const row = resultsBody.insertRow();
                     row.style.animation = `fadeIn 0.3s ease-out ${index * 0.1}s`;
                     row.innerHTML = `
-                        <td>${r.shift}</td>
-                        <td>${Math.round(r.score)}</td>
-                        <td>${r.decrypted}</td>
-                    `;
+                <td>${r.shift}</td>
+                <td>${Math.round(r.score)}</td>
+                <td>${r.decrypted}</td>
+            `;
+                    // Modified class assignment
                     if (r.is_valid) {
-                        row.classList.add('selected');
-                    }
-                    if (r.score > 80) {
-                        row.classList.add('selected');
+                        row.classList.add('high-confidence');
+                    } else if (r.has_any_valid) {
+                        row.classList.add('low-confidence');
                     }
                 }
             });
