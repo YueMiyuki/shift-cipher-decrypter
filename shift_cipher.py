@@ -229,25 +229,43 @@ def analyze_text(text):
     return frequencies, score
 
 def validate_decryption(decrypted, sample_size=10, threshold=0.7):
-    words = []
-    for word in decrypted.split():
-        cleaned_word = "".join([c for c in word if cisalpha(c)])
-        if cleaned_word:
-            words.append(cleaned_word.lower())
+    """
+    Validate the decrypted text by checking the percentage of valid English words.
+
+    Args:
+        decrypted (str): The decrypted text to validate.
+        sample_size (int, optional): Number of words to sample for validation. Defaults to 10.
+        threshold (float, optional): Threshold of valid words required. Defaults to 0.7.
+
+    Returns:
+        tuple: (sample_valid, any_valid, valid_words_info)
+            - sample_valid (bool): Sample meets threshold.
+            - any_valid (bool): Any valid words in text.
+            - valid_words_info (list[bool]): Validity of each cleaned word.
+    """
+    all_words = decrypted.split()
+    cleaned_words = []
+    valid_flags = []
+    for word in all_words:
+        cleaned = "".join([c for c in word if cisalpha(c)]).lower()
+        cleaned_words.append(cleaned)
+        is_valid = english_dict.check(cleaned) if cleaned else False
+        valid_flags.append(is_valid)
     
-    if not words:
-        return False, False
+    if not cleaned_words:
+        return (False, False, [])
+
+    has_any_valid = any(valid_flags)
+    words_to_check = min(sample_size, len(cleaned_words))
     
-    # Check if any word in the entire list is valid
-    has_any_valid = any(english_dict.check(word) for word in words)
+    if len(cleaned_words) > sample_size:
+        sampled_indices = random.sample(range(len(cleaned_words)), words_to_check)
+    else:
+        sampled_indices = list(range(len(cleaned_words)))
     
-    # Original sample validation
-    words_to_check = min(sample_size, len(words))
-    sampled_words = random.sample(words, words_to_check) if len(words) > sample_size else words
-    valid_words = sum(1 for word in sampled_words if english_dict.check(word))
-    valid_percentage = valid_words / words_to_check
-    
-    return (valid_percentage >= threshold, has_any_valid)  # Modified to return tuple
+    valid_count = sum(valid_flags[i] for i in sampled_indices)
+    valid_percentage = valid_count / words_to_check
+    return (valid_percentage >= threshold, has_any_valid, valid_flags)
 
 def decrypt_with_shift(ciphertext, shift):
     """
@@ -282,7 +300,7 @@ def decrypt_with_shift(ciphertext, shift):
     frequencies = count_letters(decrypted)
     score = calculate_frequency_score(frequencies)
 
-    is_valid, has_any_valid = validate_decryption(decrypted)
+    is_valid, has_any_valid, valid_words_info = validate_decryption(decrypted)
 
     result = {
         "shift": shift,
@@ -291,6 +309,7 @@ def decrypt_with_shift(ciphertext, shift):
         "score": score,
         "is_valid": is_valid,
         "has_any_valid": has_any_valid,
+        "valid_words_info": valid_words_info,
     }
 
     return result

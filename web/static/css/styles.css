@@ -403,6 +403,17 @@ button:active {
     border-left: 4px solid #ff4444;
 }
 
+.valid-word {
+    text-decoration: underline;
+    text-decoration-color: #4CAF50;
+    text-decoration-thickness: 2px;
+}
+
+.copied {
+    background-color: rgba(33, 150, 243, 0.2) !important;
+    transition: background-color 0.3s ease;
+}
+
 #download {
     background: linear-gradient(45deg, #2196F3, #1976D2);
     margin-top: 1rem;
