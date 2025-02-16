@@ -47,7 +47,7 @@
                 <thead>
                     <tr>
                         <th>Shift Key</th>
-                        <th>Confidence</th>
+                        <th>Confidence <span class="info-button" id="infoButton">i</span></th>
                         <th>Decrypted Text</th>
                     </tr>
                 </thead>
@@ -55,7 +55,23 @@
             </table>
             <p class="table-comment">The highlighted item include valid english words.</p>
         </div>
-    </div>
+    
+        <div class="info-window" id="infoWindow">
+            <div class="info-window-content">
+                <h4>How the Sorting Algorithm Works</h4>
+                <p>The sorting algorithm used in this decryption process works as follows:</p>
+                <ol>
+                    <li>Each possible shift is applied to the ciphertext, creating 26 potential decryptions.</li>
+                    <li>Each decryption is analyzed for the presence of valid English words.</li>
+                    <li>A confidence score is calculated based on the number and length of valid words found.</li>
+                    <li>The results are sorted in descending order of confidence, with the highest scoring decryption at the top.</li>
+                    <li>The algorithm also considers factors like valid english words to refine the scoring.</li>
+                </ol>
+                <p>This approach helps identify the most likely correct decryption by prioritizing results that contain more recognizable English words and phrases.</p>
+            </div>
+            <button class="close-button" id="closeButton">Close</button>
+        </div>
+        <div class="overlay" id="overlay"></div>
     <script>
         const input = document.getElementById('input');
         const output = document.getElementById('output');
@@ -242,27 +258,13 @@
             }
         });
 
-        function createGridAndRays() {
-            // Create grid background
-            const grid = document.createElement('div');
-            grid.className = 'grid-background';
-            document.body.appendChild(grid);
-
-            // Create light rays with better positioning
-            function createRay() {
-                const ray = document.createElement('div');
-                ray.className = 'light-ray';
-                ray.style.left = `${Math.random() * 100}%`;
-                ray.style.top = `${Math.random() * 100}%`;
-                ray.style.transform = `translate(-50%, -50%) rotate(${Math.random() * 360}deg)`;
-                document.body.appendChild(ray);
-            }
-
-            // Create multiple rays
-            for (let i = 0; i < 4; i++) {
-                createRay();
-            }
-        }
+        // Remove duplicate grid creation
+function createGrid() {
+    document.querySelectorAll('.grid-background').forEach(el => el.remove());
+    const grid = document.createElement('div');
+    grid.className = 'grid-background';
+    document.body.appendChild(grid);
+}
 
         // Update theme toggle handler
         modeToggle.addEventListener('click', () => {
@@ -270,14 +272,14 @@
             body.classList.toggle('dark-mode');
             // Force redraw of rays
             document.querySelectorAll('.light-ray').forEach(ray => ray.remove());
-            createGridAndRays();
+            createGrid();
             updateThemeIcon();
         });
 
         // Initialize on load
         window.addEventListener('load', () => {
             setInitialTheme();
-            createGridAndRays();
+            createGrid();
             document.body.style.opacity = '0';
             setTimeout(() => {
                 document.body.style.transition = 'opacity 0.5s ease';
@@ -285,7 +287,28 @@
             }, 0);
         });
 
-        window.addEventListener('load', createGridAndRays);
+        const infoButton = document.getElementById('infoButton');
+    const infoWindow = document.getElementById('infoWindow');
+    const closeButton = document.getElementById('closeButton');
+    const overlay = document.getElementById('overlay');
+
+infoButton.addEventListener('click', () => {
+    overlay.classList.add('active');
+    infoWindow.style.display = 'block';
+    void infoWindow.offsetWidth;
+    infoWindow.classList.add('active');
+});
+
+closeButton.addEventListener('click', () => {
+    infoWindow.classList.remove('active');
+    overlay.classList.remove('active');
+    setTimeout(() => infoWindow.style.display = 'none', 300);
+});
+
+window.addEventListener('click', (e) => {
+    if (e.target === overlay) closeButton.click();
+});
+
     </script>
 </body>
 
