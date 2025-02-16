@@ -17,7 +17,7 @@ This project implements a Shift Cipher Decrypter with a web-based user interface
 1. The program analyzes the frequency of letters in the ciphertext.
 2. It tries decryption using the most common English letters first, improving efficiency.
 3. For each attempt, it validates the first few words using a dictionary API.
-4. It displays up to 8 possible decryptions, sorted by likelihood.
+4. It displays all possible decryptions, sorted by likelihood.
 5. The user can select any of the displayed decryptions or download the suggested one.
 
 ## Dependencies
