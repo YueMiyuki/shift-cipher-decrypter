@@ -1,0 +1,43 @@
+graph TD
+    A["Main Program"]
+    B["Utility Functions"]
+    C["Decryption Functions"]
+    D["Queue Processing"]
+    E["Global Variables"]
+
+    A -->|Uses| B
+    A -->|Uses| C
+    A -->|Uses| D
+    A -->|Uses| E
+
+    B -->|Includes| B1["ccase"]
+    B -->|Includes| B2["cisalpha"]
+    B -->|Includes| B3["shift_char"]
+    B -->|Includes| B4["count_letters"]
+    B -->|Includes| B5["calculate_frequency_score"]
+    B -->|Includes| B6["analyze_text"]
+    B -->|Includes| B7["validate_input"]
+
+    C -->|Includes| C1["decrypt"]
+    C -->|Includes| C2["decrypt_with_shift"]
+    C -->|Includes| C3["decrypt_message"]
+    C -->|Includes| C4["validate_decryption"]
+
+    D -->|Includes| D1["process_queue"]
+
+    E -->|Includes| E1["decrypt_queue"]
+    E -->|Includes| E2["termination_event"]
+    E -->|Includes| E3["english_dict"]
+    E -->|Includes| E4["ENGLISH_FREQUENCIES"]
+
+    C1 -->|Steps| C1S["1. Iterate through text<br/>2. Shift each character<br/>3. Return decrypted text"]
+    C2 -->|Steps| C2S["1. Check termination event<br/>2. Decrypt text<br/>3. Calculate frequencies<br/>4. Calculate score<br/>5. Validate decryption<br/>6. Return result"]
+    C3 -->|Steps| C3S["1. Clear termination event<br/>2. Analyze original text<br/>3. Create thread pool<br/>4. Submit decryption tasks<br/>5. Collect results<br/>6. Sort results<br/>7. Select best match<br/>8. Return response"]
+    C4 -->|Steps| C4S["1. Split text into words<br/>2. Clean and validate words<br/>3. Sample words if necessary<br/>4. Check against dictionary<br/>5. Calculate validity percentage<br/>6. Return validation results"]
+
+    D1 -->|Steps| D1S["1. Enter infinite loop<br/>2. Get task from queue<br/>3. Process decryption task<br/>4. Call callback with result<br/>5. Handle exceptions<br/>6. Mark task as done"]
+
+    B4 -->|Steps| B4S["1. Count letter occurrences<br/>2. Calculate total letters<br/>3. Compute percentage frequencies"]
+    B5 -->|Steps| B5S["1. Compare to ENGLISH_FREQUENCIES<br/>2. Calculate total difference<br/>3. Compute similarity score"]
+    B6 -->|Steps| B6S["1. Count letter frequencies<br/>2. Calculate frequency score"]
+    B7 -->|Steps| B7S["1. Check for any alphabetic chars<br/>2. Return boolean result"]
