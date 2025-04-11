@@ -1,0 +1,10 @@
+graph TD;
+    A["Start: ccase(char, to_upper)"] --> B{"Is char uppercase AND to_upper=False?"}
+    B -->|Yes| C["Convert to lowercase: chr(ord(char) + 32)"]
+    B -->|No| D{"Is char lowercase AND to_upper=True?"}
+    D -->|Yes| E["Convert to uppercase: chr(ord(char) - 32)"]
+    D -->|No| F["Return char unchanged"]
+    C --> G["Return converted char"]
+    E --> G
+    F --> G
+    G --> H["End"]

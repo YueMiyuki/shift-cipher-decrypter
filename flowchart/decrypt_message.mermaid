@@ -1,0 +1,15 @@
+graph TD;
+    A["Start: decrypt_message(ciphertext)"] --> B["Clear termination_event"]
+    B --> C["Analyze original text"]
+    C --> D["Create ThreadPoolExecutor"]
+    D --> E["Submit decrypt_with_shift for all 26 shifts"]
+    E --> F["Collect results"]
+    F --> G["Sort results by validity and score"]
+    G --> H["Select best match"]
+    H --> I["Create response dictionary"]
+    I --> J{"Is there a best match?"}
+    J -->|Yes| K["Set success status and message"]
+    J -->|No| L["Set error status and message"]
+    K --> M["Return response"]
+    L --> M
+    M --> N["End"]

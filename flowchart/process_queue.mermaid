@@ -1,0 +1,11 @@
+graph TD;
+    A["Start: process_queue()"] --> B["Enter infinite loop"]
+    B --> C["Try to get task from queue with timeout"]
+    C --> D{"Task is None?"}
+    D -->|Yes| E["Break loop"]
+    D -->|No| F["Extract ciphertext and callback"]
+    F --> G["Call decrypt_message"]
+    G --> H["Call callback with result"]
+    H --> I["Mark task as done"]
+    I --> B
+    E --> J["End"]

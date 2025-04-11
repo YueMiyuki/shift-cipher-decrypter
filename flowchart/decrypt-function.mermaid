@@ -1,0 +1,6 @@
+graph TD;
+    A["Start: decrypt(text, shift)"] --> B["For each char in text"]
+    B --> C["Apply shift_char(char, -shift)"]
+    C --> D["Join all shifted characters"]
+    D --> E["Return decrypted text"]
+    E --> F["End"]

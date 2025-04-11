@@ -1,0 +1,10 @@
+graph TD;
+    A["Start: shift_char(char, shift)"] --> B{"Is char between 'a' and 'z'?"}
+    B -->|Yes| C["Shift within lowercase alphabet: chr((ord(char) - ord('a') + shift) % 26 + ord('a'))"]
+    B -->|No| D{"Is char between 'A' and 'Z'?"}
+    D -->|Yes| E["Shift within uppercase alphabet: chr((ord(char) - ord('A') + shift) % 26 + ord('A'))"]
+    D -->|No| F["Return char unchanged"]
+    C --> G["Return shifted char"]
+    E --> G
+    F --> G
+    G --> H["End"]

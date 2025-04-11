@@ -37,6 +37,10 @@ This project implements a Shift Cipher Decrypter with a web-based user interface
   - `templates/`: Contain HTML Template
     - `index.html`: Frontend code
     - `README.md`: Frontend documentation
+- `flowchart/`: Contains flow chart .mermaid files
+  - `*.mermaid`: Chart mermaid files
+  - `svg/`: Contains svg files from the .mermaid files
+    - `*.svg`: All mermaid charts
 - `README.md`:  Main documentation
 - `requirements.txt`: pip requirements
 - `.gitignore`: Git ignore file

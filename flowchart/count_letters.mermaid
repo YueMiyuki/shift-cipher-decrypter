@@ -1,0 +1,11 @@
+graph TD;
+    A["Start: count_letters(text)"] --> B["Initialize Counter"]
+    B --> C["For each char in text"]
+    C --> D{"Is char alphabetic?"}
+    D -->|Yes| E["Convert to lowercase and add to Counter"]
+    D -->|No| F["Skip char"]
+    E --> G["Calculate total count"]
+    F --> C
+    G --> H["Calculate percentage frequency for each letter"]
+    H --> I["Return frequency dictionary"]
+    I --> J["End"]

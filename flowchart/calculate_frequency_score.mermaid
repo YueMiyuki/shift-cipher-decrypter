@@ -1,0 +1,9 @@
+graph TD;
+    A["Start: calculate_frequency_score(frequencies)"] --> B["Initialize total_difference = 0.0"]
+    B --> C["For each letter and freq in frequencies"]
+    C --> D["Get expected English frequency"]
+    D --> E["Add absolute difference to total_difference"]
+    E --> F["Calculate score = ((max_sum - total_difference) / max_sum) * 100"]
+    F --> G["Ensure score is between 0 and 100"]
+    G --> H["Return score"]
+    H --> I["End"]

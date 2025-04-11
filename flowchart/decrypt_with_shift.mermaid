@@ -1,0 +1,11 @@
+graph TD;
+    A["Start: decrypt_with_shift(ciphertext, shift)"] --> B{"Is termination_event set?"}
+    B -->|Yes| C["Return None"]
+    B -->|No| D["Decrypt text using shift"]
+    D --> E["Calculate frequencies"]
+    E --> F["Calculate score"]
+    F --> G["Validate decryption"]
+    G --> H["Create result dictionary"]
+    H --> I["Return result"]
+    C --> J["End"]
+    I --> J

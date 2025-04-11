@@ -1,0 +1,14 @@
+graph TD;
+    A["Start: validate_decryption(decrypted, sample_size, threshold)"] --> B["Split text into words"]
+    B --> C["Clean words and check validity"]
+    C --> D{"Any words to check?"}
+    D -->|No| E["Return False, False, []"]
+    D -->|Yes| F["Check if any words are valid"]
+    F --> G["Determine sample size"]
+    G --> H{"More words than sample_size?"}
+    H -->|Yes| I["Randomly sample words"]
+    H -->|No| J["Use all words"]
+    I --> K["Calculate valid percentage"]
+    J --> K
+    K --> L["Return validation results"]
+    L --> M["End"]

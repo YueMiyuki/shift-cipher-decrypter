@@ -1,0 +1,6 @@
+graph TD;
+    A["Start: cisalpha(char)"] --> B{"Is char between 'a' and 'z' OR between 'A' and 'Z'?"}
+    B -->|Yes| C["Return True"]
+    B -->|No| D["Return False"]
+    C --> E["End"]
+    D --> E

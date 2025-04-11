@@ -1,0 +1,5 @@
+graph TD;
+    A["Start: analyze_text(text)"] --> B["Calculate frequencies using count_letters(text)"]
+    B --> C["Calculate score using calculate_frequency_score(frequencies)"]
+    C --> D["Return frequencies and score"]
+    D --> E["End"]
