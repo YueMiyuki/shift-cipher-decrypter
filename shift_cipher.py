@@ -198,12 +198,19 @@ def calculate_frequency_score(frequencies):
           to ensure it falls within the 0-100 range.
     """
 
+    # Initialize total difference counter
     total_difference = 0.0
+
+    # Compare each letter's frequency to English frequencies
     for letter, freq in frequencies.items():
+        # Get standard frequency (0.0 if letter not in English data)
         english_freq = ENGLISH_FREQUENCIES.get(letter, 0.0)
+        # Accumulate absolute differences
         total_difference += abs(freq - english_freq)
-    # Calculate the score, ensuring it's within 0-100
+    # Normalize against maximum possible difference
     score = ((max_sum - total_difference) / max_sum) * 100
+
+    # Ensure score stays within 0-100 range
     return max(0.0, min(100.0, score))
 
 
@@ -349,7 +356,7 @@ def decrypt_message(ciphertext):
 
     results = []
 
-    # Create a ThreadPoolExecutor with 26 threads to test all possible shifts concurrently
+    # Test all possible shifts concurrently
     with ThreadPoolExecutor(max_workers=26) as executor:
         future_to_shift = {
             executor.submit(decrypt_with_shift, ciphertext, shift): shift

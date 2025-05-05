@@ -22,7 +22,7 @@ function convertMermaidToSvg(mermaidCode, css = '') {
     fs.writeFileSync(inputPath, mermaidCode);
     if (css) fs.writeFileSync(cssPath, css);
 
-    let command = `../node_modules/.bin/mmdc -i "${inputPath}" -o "${outputPath}" --quiet`;
+    let command = `../../node_modules/.bin/mmdc -i "${inputPath}" -o "${outputPath}" --quiet`;
     if (css) command += ` --cssFile "${cssPath}"`;
 
     execSync(command);
