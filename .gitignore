@@ -3,3 +3,4 @@ __pycache__
 .env
 Structure.svg
 node_modules
+.DS_Store
